@@ -111,7 +111,7 @@ h2{font-size:1.05rem;margin:18px 0 10px}
 const $=s=>document.querySelector(s),esc=x=>String(x==null?"":x).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
 const P={check:'<path d="m5 12 5 5 9-10"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',up:'<path d="M6 15l6-6 6 6"/>',dn:'<path d="M6 9l6 6 6-6"/>'};
 const ic=n=>`<svg class="i" viewBox="0 0 24 24">${P[n]}</svg>`;
-const SB={url:"https://bfutxvepgajwnfzyxqjp.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdXR4dmVwZ2Fqd25menl4cWpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzc3NDAsImV4cCI6MjEwODc1Mzc0MH0.636mxG1gHfG8XLvkfzZfC9aMuz7c2ZTdEsKcpkKdaYw"};
+const sb=window.supabase.createClient(SB.url||"https://placeholder.supabase.co",SB.key||"placeholder");
 let me=null,svcs=[],ords=[],joins=[],stf=[],cfg={},tab="dash",cur=null,unread=0,fl=[],fs="";
 const own=()=>me&&me.role=="owner";
 const ago=t=>{const m=Math.floor((Date.now()-new Date(t))/6e4);return m<1?"just now":m<60?m+"m ago":m<1440?Math.floor(m/60)+"h ago":new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short"})};
