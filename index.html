@@ -66,7 +66,7 @@ nav{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:
 .ln{height:9px;border-radius:6px;margin:13px 0;transform-origin:left;background:linear-gradient(90deg,rgba(90,60,30,.12) 25%,rgba(196,141,44,.4) 50%,rgba(90,60,30,.12) 75%) 0 0/200% 100%;animation:sh 1.6s linear infinite,wr 5s ease-in-out infinite}.ln:nth-child(3){animation-delay:0s,.35s}.ln:nth-child(4){animation-delay:0s,.7s}.ln:nth-child(5){animation-delay:0s,1.05s}.ln:nth-child(6){animation-delay:0s,1.4s}@keyframes sh{to{background-position:-200% 0}}@keyframes wr{0%{transform:scaleX(0)}35%,85%{transform:scaleX(1)}100%{transform:scaleX(0)}}
 .stamp{position:absolute;right:22px;bottom:24px;border:2px solid var(--gold);color:var(--gold);padding:8px 14px;border-radius:10px;font:800 .8rem 'Playfair Display';letter-spacing:.1em;transform:rotate(-10deg);text-transform:uppercase}
 .chip{position:absolute;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:40px;font-size:.78rem;font-weight:600;background:linear-gradient(145deg,#fffdf6,#f3e6c8);border:1px solid var(--line);box-shadow:0 14px 26px rgba(90,60,30,.25),inset 0 1px 0 #fff;animation:fl2 6s ease-in-out infinite}
-.chip .i{color:var(--gold)}.c1{left:0;top:40px}.c2{right:0;bottom:60px;animation-delay:-3s}
+.chip .i{color:var(--gold)}.c1{left:0;top:-6px}.c2{right:0;bottom:-6px;animation-delay:-3s}
 @keyframes fl2{50%{transform:translateY(-10px)}}
 /* 3D ring */
 .stage{position:relative;height:var(--h,380px);perspective:1100px;overflow:hidden;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
@@ -130,6 +130,9 @@ footer h4{color:#f2c75c;margin-bottom:10px;font-size:.8rem;letter-spacing:.12em;
 .vw[hidden]{display:none}.mbox{max-height:92dvh}.ck{list-style:none;margin:12px 0 18px}.ck li{display:flex;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:.88rem}.ck .i{color:var(--gold);flex:none;margin-top:2px}.sub{color:var(--mut);font-size:.84rem;line-height:1.5}.chips2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.chips2 label{cursor:pointer;position:relative}.chips2 input{position:absolute;opacity:0;width:1px;margin:0}.chips2 span{display:block;text-align:center;font-size:.72rem;font-weight:600;padding:11px 4px;border-radius:12px;border:1px solid var(--line);background:#fff}.chips2 input:checked+span{background:var(--ink);color:#f2c75c;border-color:var(--ink)}.up{display:block;padding:14px;border:1.5px dashed var(--gold2);border-radius:14px;text-align:center;font-size:.82rem;cursor:pointer;margin-bottom:10px;background:rgba(255,255,255,.55)}.up input{display:none}.cs{display:flex;gap:8px;font-size:.74rem;color:var(--mut);margin:4px 0 14px;align-items:flex-start}.cs input{width:auto;margin:3px 0 0}.err{color:#b3261e;font-size:.8rem;margin-top:10px}.tk{text-align:center;padding:18px;border-radius:18px;background:var(--ink);color:#f6ead2;margin:14px 0}.tk b{display:block;font:800 1.9rem 'Playfair Display';letter-spacing:.1em;color:#f2c75c;margin:4px 0 12px}.tl{list-style:none;margin:16px 0 4px}.tl li{display:flex;gap:12px;padding-bottom:18px;position:relative;font-size:.88rem}.tl li:not(:last-child):before{content:"";position:absolute;left:11px;top:26px;bottom:0;width:2px;background:var(--line)}.tl li>i{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none;background:#fff;color:#fff;font-size:.8rem}.tl li.done>i{background:var(--gold2);border-color:var(--gold2)}.tl li.cur>i{border-color:var(--gold2);animation:pl 1.6s infinite}.tl small{display:block;color:var(--mut);font-size:.72rem}@keyframes pl{50%{box-shadow:0 0 0 7px rgba(196,141,44,0)}0%{box-shadow:0 0 0 0 rgba(196,141,44,.4)}}.faq details{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:10px}.faq summary{font-weight:600;cursor:pointer}.faq p{margin-top:10px;color:var(--mut);font-size:.88rem;line-height:1.6}.stats b .i{fill:var(--gold2);stroke:none;font-size:.8em;vertical-align:-.05em}
 .bn{display:inline-block;margin-bottom:12px;padding:8px 14px;border-radius:30px;font-size:.78rem;font-weight:600;background:linear-gradient(145deg,#fffdf6,#f3e6c8);border:1px solid var(--line);box-shadow:0 6px 14px rgba(90,60,30,.15)}
 .oc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}.oc summary{cursor:pointer;font-size:.9rem}.oc .tl{margin-top:14px}
+.typ{font-size:clamp(.82rem,2.2vw,.95rem);line-height:1.65;min-height:7.5em;font-weight:500;color:var(--ivory)}
+.typ:after{content:"";display:inline-block;width:2px;height:1.1em;background:var(--gold2);margin-left:2px;vertical-align:-.15em;animation:cur 1s steps(1) infinite}
+@keyframes cur{50%{opacity:0}}
 </style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
@@ -149,7 +152,7 @@ footer h4{color:#f2c75c;margin-bottom:10px;font-size:.8rem;letter-spacing:.12em;
     <div class="hstats"><div><b data-price="drafting">₹20</b><span>per page drafting</span></div><div><b data-price="rent">₹499</b><span>rent agreements from</span></div><div><b>2 hrs</b><span>affidavit delivery</span></div></div>
   </div>
   <div class="hv">
-    <div class="doc"><div class="dh"><i data-i="file"></i>Affidavit<span class="ok">Verified</span></div><div class="ln" style="width:90%"></div><div class="ln"></div><div class="ln" style="width:70%"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:55%"></div><div class="stamp">Notarised</div></div>
+    <div class="doc"><div class="dh"><i data-i="file"></i>Affidavit<span class="ok">Verified</span></div><p class="typ" id="typ">Forgot to apply for your affidavit in time? Need it urgently, or can't deal with the city rush? LegalSaathi is here to help. Get it at your doorstep in 2 hours.</p><div class="stamp">Notarised</div></div>
     <div class="chip c1"><i data-i="lock"></i>Secure delivery</div><div class="chip c2"><i data-i="bolt"></i>Delivered in 2 hrs</div>
   </div>
 </header>
@@ -298,7 +301,7 @@ $("#v-join").onsubmit=async e=>{e.preventDefault();const o=$("#j-o");if(!SB.url)
 document.addEventListener("click",e=>{const o=e.target.closest("[data-order]"),j=e.target.closest("[data-join]"),t=e.target.closest("[data-track]");if(o){e.preventDefault();order(o.dataset.order)}else if(j){e.preventDefault();show("v-join")}else if(t){e.preventDefault();show("v-track")}});
 $("#mx").onclick=closeM;$("#md").onclick=e=>{if(e.target.id=="md")closeM()};
 const io=new IntersectionObserver(a=>a.forEach(x=>x.isIntersecting&&x.target.classList.add("in")),{threshold:.08});
-document.querySelectorAll(".rv").forEach(r=>io.observe(r));
+document.querySelectorAll(".rv").forEach(r=>io.observe(r)); (()=>{const e=$("#typ");if(!e)return;const t=e.textContent.trim();if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;e.textContent="";let i=0,d=1;(function k(){e.textContent=t.slice(0,i);if(d){if(i++<t.length)return setTimeout(k,38);d=0;return setTimeout(k,3500)}if(i>0){i-=3;if(i<0)i=0;return setTimeout(k,12)}d=1;setTimeout(k,600)})()})();
 </script>
 </body>
 </html>
