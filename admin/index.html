@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#f4ead6">
 <title>LegalSaathi Admin</title>
-<link rel="icon" href="../legalsathilogo.webp">
+<link rel="icon" href="../legalsathilogo.webp"><link rel="manifest" href="/admin/manifest.json"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="LS Admin">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
@@ -80,7 +80,7 @@ h2{font-size:1.05rem;margin:18px 0 10px}
 </style>
 </head>
 <body>
-<div id="login" hidden><form class="card" id="lf"><div class="brand"><img src="../legalsathilogo.webp" alt="" onerror="this.style.display='none'">Legal<b>Saathi</b></div><h2 style="margin:0 0 14px">Admin sign in</h2><label class="l">Email</label><input id="le" type="email" autocomplete="username" required><label class="l">Password</label><input id="lp" type="password" autocomplete="current-password" required><button class="btn" style="width:100%">Sign in</button><p class="err" id="lerr"></p></form></div>
+<div id="login" hidden><form class="card" id="lf"><div class="brand"><img src="../legalsathilogo.webp" alt="" onerror="this.style.display='none'">Legal<b>Saathi</b></div><h2 style="margin:0 0 14px">Admin sign in</h2><label class="l">Email</label><input id="le" type="email" autocomplete="username" required><label class="l">Password</label><input id="lp" type="password" autocomplete="current-password" required><button class="btn" style="width:100%">Sign in</button><button class="btn ghost sm inst" hidden type="button" style="width:100%;margin-top:12px">Install app</button><p class="err" id="lerr"></p></form></div>
 
 <div id="app" hidden>
 <aside>
@@ -92,7 +92,7 @@ h2{font-size:1.05rem;margin:18px 0 10px}
   <button data-t="settings"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Settings</button>
 </aside>
 <main>
-  <div class="top"><h1 id="ttl">Dashboard</h1><div class="act"><span class="role" id="role"></span><button class="ib" id="bell" title="Alerts" aria-label="Enable alerts"><svg class="i" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg></button><button class="ib" id="out" title="Sign out" aria-label="Sign out"><svg class="i" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M16 8l5 4-5 4M21 12H9"/></svg></button></div></div>
+  <div class="top"><h1 id="ttl">Dashboard</h1><div class="act"><button class="ib inst" hidden type="button" title="Install app" aria-label="Install app"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></button><span class="role" id="role"></span><button class="ib" id="bell" title="Alerts" aria-label="Enable alerts"><svg class="i" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg></button><button class="ib" id="out" title="Sign out" aria-label="Sign out"><svg class="i" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M16 8l5 4-5 4M21 12H9"/></svg></button></div></div>
   <section id="t-dash"></section>
   <section id="t-orders" hidden><div class="tools"><input id="oq" placeholder="Search token, name or phone"><select id="of"><option value="act">Active</option><option value="need">Needs action</option><option value="done">Delivered</option><option value="">All</option></select><select id="os"></select></div><div id="ol"></div></section>
   <section id="t-joins" hidden><div class="tools"><select id="jf" style="grid-column:1/-1"><option value="new">New</option><option value="done">Handled</option><option value="">All</option></select></div><div id="jl"></div></section>
@@ -210,7 +210,7 @@ function rSet(){let h=`<div class="card"><h3 style="margin-bottom:8px">Alerts</h
 async function saveCfg(){const{error}=await sb.from("settings").upsert([{key:"banner",value:$("#cb").value.trim()},{key:"orders_open",value:String($("#co").checked)}]);if(!error){cfg.banner=$("#cb").value.trim();cfg.orders_open=String($("#co").checked)}toast(error?"Failed":"Saved","Website settings")}
 async function addStaff(){const u=$("#su").value.trim(),n=$("#sn").value.trim();if(!u||!n)return toast("Missing","Enter user ID and name.");const{error}=await sb.from("staff").insert({user_id:u,name:n,role:$("#sr").value});if(error)return toast("Failed","Check the user ID.");const s=await sb.from("staff").select("*");stf=s.data||[];render()}
 function csv(){const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"',r=[["Token","Service","Name","Phone","Delivery","Address","Pincode","Status","Placed"]].concat(ords.map(o=>{const L=live(o);return[o.token,o.service_title,o.name,o.phone,o.delivery,o.address,o.pincode,L.f[L.i]?L.f[L.i].n:"",o.created_at]}));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([r.map(x=>x.map(q).join(",")).join("\n")],{type:"text/csv"}));a.download="legalsaathi-orders.csv";a.click()}
-/* start */
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/admin/sw.js",{scope:"/admin/"}).catch(()=>{})); let dip=null;const sa=matchMedia("(display-mode: standalone)").matches||navigator.standalone,ios=/iphone|ipad|ipod/i.test(navigator.userAgent); const showI=()=>document.querySelectorAll(".inst").forEach(b=>b.hidden=false); addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;showI()}); addEventListener("appinstalled",()=>document.querySelectorAll(".inst").forEach(b=>b.hidden=true)); if(ios&&!sa)showI(); document.querySelectorAll(".inst").forEach(b=>b.onclick=async()=>{if(dip){dip.prompt();await dip.userChoice;dip=null;document.querySelectorAll(".inst").forEach(x=>x.hidden=true)}else toast("Install on iPhone","Tap the Share button, then Add to Home Screen.")}); /* start */
 if(!SB.url){$("#login").hidden=false;$("#lerr").textContent="Add your Supabase URL and key in this file first."}else sb.auth.getSession().then(({data})=>data.session?enter():$("#login").hidden=false);
 </script>
 </body>
