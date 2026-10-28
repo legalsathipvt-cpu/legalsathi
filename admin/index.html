@@ -63,7 +63,7 @@ h2{font-size:1.05rem;margin:18px 0 10px}
 .tl{list-style:none;margin:10px 0}.tl li{display:flex;gap:12px;padding:0 0 16px;position:relative;font-size:.88rem;cursor:pointer}
 .tl li:not(:last-child):before{content:"";position:absolute;left:11px;top:26px;bottom:0;width:2px;background:var(--line)}
 .tl li>i{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none;background:#fff;color:#fff;font-size:.8rem}
-.tl li.done>i{background:var(--gold2);border-color:var(--gold2)}.tl li.cur>i{border-color:var(--gold2);box-shadow:0 0 0 4px rgba(196,141,44,.25)}
+.tl li.done>i{background:var(--gold2);border-color:var(--gold2)}.tl li.cur>i{border:2.5px solid rgba(196,141,44,.25);border-top-color:var(--gold2);background:#fff;animation:spin .9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:8px 0}
 .files a{display:block;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:var(--ivory);font-size:.7rem;text-align:center}
 .files img{width:100%;height:84px;object-fit:cover;display:block}.files span{display:block;padding:30px 4px;font-weight:700}
@@ -162,11 +162,11 @@ function setDw(h){$("#dw").innerHTML=h;$("#dw").classList.add("on");$("#ov").cla
 function closeDw(){$("#dw").classList.remove("on");$("#fw").classList.remove("on");$("#ov").classList.remove("on");cur=null}
 $("#ov").onclick=closeDw;
 async function openO(id){const o=ords.find(x=>x.id==id);if(!o)return;cur=id;const L=live(o);let t=L.t,e="";
- const steps=L.f.map((s,i)=>`<li data-k="${i}" class="${i<L.i?"done":i==L.i?"cur":""}"><i>${i<L.i?ic("check"):""}</i><div><b>${esc(s.n)}</b><small>${i==L.i?"Current · since "+tm(L.t):s.m==null?"Manual":s.m+" min"}</small></div></li>`).join("");
+ const steps=L.f.map((s,i)=>{const dn=i<L.i||(L.done&&i==L.i);return`<li data-k="${i}" class="${dn?"done":i==L.i?"cur":""}"><i>${dn?ic("check"):""}</i><div><b>${esc(s.n)}</b><small>${i==L.i?(dn?"Completed · "+tm(L.t):"Current · since "+tm(L.t)):s.m==null?"Manual":s.m+" min"}</small></div></li>`}).join("");
  const ex=Object.entries(o.extra||{}).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
  setDw(`<h3>${esc(o.token)}<button class="ib" data-x aria-label="Close">${ic("x")}</button></h3>
  <div class="kv"><span>Service</span><b>${esc(o.service_title)}</b></div><div class="kv"><span>Customer</span><b>${esc(o.name)}</b></div><div class="kv"><span>Mobile</span><b>${esc(o.phone)}</b></div><div class="kv"><span>Delivery</span><b>${esc(o.delivery)}</b></div>${o.address?`<div class="kv"><span>Address</span><b>${esc(o.address)} ${esc(o.pincode)}</b></div>`:""}<div class="kv"><span>Placed</span><b>${tm(o.created_at)}</b></div>${ex}${o.note?`<div class="kv"><span>Customer note</span><b>${esc(o.note)}</b></div>`:""}
- <div class="btns"><a class="btn sm" href="tel:+91${esc(o.phone)}">Call</a><a class="btn sm ghost" target="_blank" rel="noopener" href="https://wa.me/91${esc(o.phone)}?text=${encodeURIComponent("Hi "+o.name+", this is LegalSaathi about your request "+o.token)}">WhatsApp</a></div>
+ <div class="btns"><a class="btn sm" href="tel:+91${esc(o.phone)}">Call</a><a class="btn sm ghost" target="_blank" rel="noopener" href="https://wa.me/91${esc(o.phone)}?text=${encodeURIComponent("Hi "+o.name+", this is LegalSaathi about your request "+o.token)}">WhatsApp</a><button class="btn sm ghost" data-rq>Ask for review</button></div>
  <h2>Documents</h2><div class="files" id="fz">${o.files&&o.files.length?"Loading…":'<small>No files uploaded.</small>'}</div>
  <h2>Status <small style="display:inline">(tap a step to set it)</small></h2><ol class="tl">${steps}</ol>${L.i<L.n-1?`<button class="btn" data-nx>Move to next step</button>`:""}
  <h2>Internal note</h2><textarea id="inn" rows="3" placeholder="Visible to staff only">${esc(o.internal_note)}</textarea><button class="btn sm ghost" data-sn>Save note</button>${own()?`<div style="margin-top:24px"><button class="btn sm red" data-del>Delete order</button></div>`:""}`);
@@ -200,7 +200,18 @@ function rFl(){const s=svc(fs);$("#fw").innerHTML=`<h3>${esc(s.title)} statuses<
  $("#fw").classList.add("on");$("#ov").classList.add("on")}
 async function saveFl(){sync();const c=fl.filter(x=>x.n.trim()).map((x,i,a)=>({n:x.n.trim(),m:i==a.length-1||x.m==null||x.m===""?null:Math.max(1,+x.m)}));if(c.length<2)return toast("Add more","A flow needs at least 2 statuses.");
  const ids=$("#fall").checked?svcs.map(s=>s.id):[fs],{error}=await sb.from("services").update({flow:c}).in("id",ids);if(error)return toast("Failed","Could not save.");ids.forEach(i=>svc(i).flow=c);toast("Saved","Statuses updated");closeDw();render()}
-/* reviews */
+document.addEventListener("click",async e=>{
+ if(!e.target.closest("[data-rq]"))return;
+ const o=ords.find(x=>x.id==cur);if(!o)return;
+ const w=window.open("","_blank");
+ const al="abcdefghjkmnpqrstuvwxyz23456789",c=Array.from(crypto.getRandomValues(new Uint8Array(8))).map(b=>al[b%al.length]).join("");
+ const{error}=await sb.from("review_invites").insert({code:c});
+ if(error){if(w)w.close();return toast("Failed","Could not create the review link.")}
+ const u=location.origin+"/review.html?c="+c+"&n="+encodeURIComponent(o.name)+"&t="+encodeURIComponent(o.token);
+ const m="Hi "+o.name+", thank you for choosing LegalSaathi! Please share your experience here: "+u;
+ const wa="https://wa.me/91"+o.phone+"?text="+encodeURIComponent(m);
+ if(w)w.location.href=wa;else location.href=wa});
+  /* reviews */
 let revs=[];
 async function loadRevs(){const{data}=await sb.from("reviews").select("*").order("created_at",{ascending:false});revs=data||[];if(tab=="reviews")rRev()}
 function rRev(){
