@@ -260,7 +260,7 @@ class Ring{constructor(st,auto){this.st=st;this.r=st.querySelector(".ring");this
   this.rot+=(this.t-this.rot)*.12;this.r.style.transform=`translateZ(${-this.R}px) rotateY(${this.rot}deg)`;
   this.c.forEach((c,i)=>{const a=(((i*this.s+this.rot)%360)+540)%360-180,k=(1+Math.cos(a*Math.PI/180))/2;c.style.opacity=.2+.8*Math.pow(k,1.4);c.style.pointerEvents=Math.abs(a)<40?"auto":"none"});
   requestAnimationFrame(this.tick)}}
-new Ring($("#s1"),0);new Ring($("#s2"),0);new Ring($("#s3"),.12);new Ring($("#s4"),.2);
+new Ring($("#s1"),0);new Ring($("#s2"),0);new Ring($("#s3"),.12); (async()=>{try{if(SB.url){const x=await fetch(SB.url+"/rest/v1/public_reviews?select=name,area,rating,body&order=created_at.desc&limit=30",{headers:H()});const a=await x.json();  if(Array.isArray(a)&&a.length>=3)$("#rv").innerHTML=a.map(r=>`<div class="card rev"><div class="stars">${ic("star").repeat(r.rating||5)}</div><p>“${esc(r.body)}”</p><div class="who"><i>${esc(r.name[0].toUpperCase())}</i><div><b>${esc(r.name)}</b><small>${r.area?esc(r.area)+", ":""}Lucknow · Verified client</small></div></div></div>`).join("")}}catch(_){}  new Ring($("#s4"),.2)})();
 $("#bg").onclick=()=>$("#lk").classList.toggle("on");
 $("#lk").onclick=e=>{if(e.target.tagName=="A")$("#lk").classList.remove("on")};
 const calc=()=>$("#pt").textContent="₹"+Math.max(1,+$("#pg").value||1)*S.drafting.p;
