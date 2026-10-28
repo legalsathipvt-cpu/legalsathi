@@ -44,7 +44,7 @@ input,textarea{width:100%;margin-bottom:10px;padding:13px;border-radius:14px;bor
 </div>
 <script src="config.js"></script>
 <script>
-const $=s=>document.querySelector(s),code=new URLSearchParams(location.search).get("c")||"";let rate=5;
+const $=s=>document.querySelector(s),qs=new URLSearchParams(location.search),code=qs.get("c")||"";let rate=5; $("#n").value=qs.get("n")||"";$("#t").value=(qs.get("t")||"").toUpperCase();if(qs.get("t"))$("#t").readOnly=true;
 const draw=()=>$("#st").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" class="${n<=rate?"on":""}" aria-label="${n} stars">★</button>`).join("");
 draw();
 $("#st").onclick=e=>{const b=e.target.closest("[data-n]");if(b){rate=+b.dataset.n;draw()}};
