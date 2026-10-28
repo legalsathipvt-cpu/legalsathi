@@ -106,12 +106,12 @@ h2{font-size:1.05rem;margin:18px 0 10px}
 <div class="dw" id="fw"></div>
 <div id="toasts"></div>
 
+<script src="../config.js"></script>
 <script>
-const SB={url:"https://bfutxvepgajwnfzyxqjp.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdXR4dmVwZ2Fqd25menl4cWpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzc3NDAsImV4cCI6MjEwODc1Mzc0MH0.636mxG1gHfG8XLvkfzZfC9aMuz7c2ZTdEsKcpkKdaYw"}; // same Supabase URL + anon key as the website
 const $=s=>document.querySelector(s),esc=x=>String(x==null?"":x).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
 const P={check:'<path d="m5 12 5 5 9-10"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',up:'<path d="M6 15l6-6 6 6"/>',dn:'<path d="M6 9l6 6 6-6"/>'};
 const ic=n=>`<svg class="i" viewBox="0 0 24 24">${P[n]}</svg>`;
-const sb=window.supabase.createClient(SB.url||"https://placeholder.supabase.co",SB.key||"placeholder");
+const SB={url:"https://bfutxvepgajwnfzyxqjp.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdXR4dmVwZ2Fqd25menl4cWpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxNzc3NDAsImV4cCI6MjEwODc1Mzc0MH0.636mxG1gHfG8XLvkfzZfC9aMuz7c2ZTdEsKcpkKdaYw"};
 let me=null,svcs=[],ords=[],joins=[],stf=[],cfg={},tab="dash",cur=null,unread=0,fl=[],fs="";
 const own=()=>me&&me.role=="owner";
 const ago=t=>{const m=Math.floor((Date.now()-new Date(t))/6e4);return m<1?"just now":m<60?m+"m ago":m<1440?Math.floor(m/60)+"h ago":new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short"})};
@@ -204,7 +204,7 @@ async function saveFl(){sync();const c=fl.filter(x=>x.n.trim()).map((x,i,a)=>({n
 function rSet(){let h=`<div class="card"><h3 style="margin-bottom:8px">Alerts</h3><p style="font-size:.84rem;color:var(--mut);margin-bottom:12px">Turn on popups and sound for new orders and join requests. Works while this page is open in a browser tab.</p><button class="btn sm" onclick="$('#bell').click()">Enable alerts</button></div>`;
  if(own())h+=`<div class="card" style="margin-top:14px"><h3 style="margin-bottom:12px">Website control</h3><label class="l">Announcement banner (shown on the homepage, empty to hide)</label><input id="cb" value="${esc(cfg.banner)}" placeholder="e.g. Diwali offer: 10% off all affidavits"><label style="display:flex;gap:10px;align-items:center;font-size:.88rem;margin-bottom:14px"><span class="sw"><input type="checkbox" id="co" ${cfg.orders_open=="false"?"":"checked"}><i></i></span> Accepting online orders</label><button class="btn sm" data-sv>Save</button></div>
  <div class="card" style="margin-top:14px"><h3 style="margin-bottom:12px">Staff</h3>${stf.map(s=>`<div class="kv"><span>${esc(s.name)}</span><b>${esc(s.role)} ${s.user_id==me.user_id?"(you)":`<button class="ib" style="display:inline-grid;width:28px;height:28px" data-sd="${s.user_id}">${ic("x")}</button>`}</b></div>`).join("")}
- <p style="font-size:.78rem;color:var(--mut);margin:14px 0 8px">Tell Developer to Provide UUID. Then paste their User ID here.</p><input id="su" placeholder="User ID (uuid)"><input id="sn" placeholder="Name"><select id="sr"><option>manager</option><option>owner</option></select><button class="btn sm" data-sa>Add staff</button></div>
+ <p style="font-size:.78rem;color:var(--mut);margin:14px 0 8px">To add someone: Supabase → Authentication → Users → Add user. Then paste their User ID here.</p><input id="su" placeholder="User ID (uuid)"><input id="sn" placeholder="Name"><select id="sr"><option>manager</option><option>owner</option></select><button class="btn sm" data-sa>Add staff</button></div>
  <div class="card" style="margin-top:14px"><h3 style="margin-bottom:8px">Export</h3><button class="btn sm ghost" data-csv>Download orders (CSV)</button></div>`;
  $("#t-settings").innerHTML=h}
 async function saveCfg(){const{error}=await sb.from("settings").upsert([{key:"banner",value:$("#cb").value.trim()},{key:"orders_open",value:String($("#co").checked)}]);if(!error){cfg.banner=$("#cb").value.trim();cfg.orders_open=String($("#co").checked)}toast(error?"Failed":"Saved","Website settings")}
