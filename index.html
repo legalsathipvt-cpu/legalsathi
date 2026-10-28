@@ -133,7 +133,15 @@ footer h4{color:#f2c75c;margin-bottom:10px;font-size:.8rem;letter-spacing:.12em;
 .typ{font-size:clamp(.82rem,2.2vw,.95rem);line-height:1.65;min-height:7.5em;font-weight:500;color:var(--ivory)}
 .typ:after{content:"";display:inline-block;width:2px;height:1.1em;background:var(--gold2);margin-left:2px;vertical-align:-.15em;animation:cur 1s steps(1) infinite}
 @keyframes cur{50%{opacity:0}}
-.pwa{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:55;display:flex;align-items:center;border-radius:40px;background:linear-gradient(145deg,#fffdf6,#f3e6c8);border:1px solid var(--line);box-shadow:0 10px 22px rgba(90,60,30,.25)} .pwa[hidden]{display:none} .pwa button{border:0;background:none;font:600 .74rem 'Plus Jakarta Sans';color:var(--ivory);padding:9px 12px;cursor:pointer} .pwa #pwa-x{padding:9px 12px 9px 2px;color:var(--mut);font-size:1rem} </style>
+  .pwa{position:fixed;left:14px;right:14px;bottom:calc(84px + env(safe-area-inset-bottom));max-width:420px;margin:auto;z-index:55;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:20px;background:linear-gradient(145deg,#fffdf6,#f3e6c8);border:1px solid var(--line);box-shadow:0 14px 28px rgba(90,60,30,.3);animation:pwin .4s ease}
+.pwa[hidden]{display:none}
+.pwa img{width:40px;height:40px;border-radius:10px;flex:none}
+.pwa .pt{flex:1;min-width:0;display:flex;flex-direction:column;font-size:.74rem;color:var(--mut);line-height:1.35}
+.pwa .pt b{font-size:.84rem;color:var(--ivory)}
+.pwa #pwa-b{border:0;cursor:pointer;font:700 .76rem 'Plus Jakarta Sans';padding:9px 16px;border-radius:30px;color:var(--ink);background:linear-gradient(180deg,#f6d27c,var(--gold2));box-shadow:0 3px 0 #7d5513}
+.pwa #pwa-x{border:0;background:none;color:var(--mut);font-size:1.3rem;cursor:pointer;padding:0 4px}
+@keyframes pwin{from{opacity:0;transform:translateY(20px)}}
+</style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
@@ -201,7 +209,7 @@ Disclaimer: LegalSaathi provides legal documentation assistance and is not a law
 
 <noscript><p style="padding:90px 22px">LegalSaathi – Affidavit &amp; Rent Agreement in Lucknow. Call +91 88813 33921.</p></noscript>
 
-<div id="pwa" class="pwa" hidden><button id="pwa-b" type="button">Install app</button><button id="pwa-x" type="button" aria-label="Dismiss">×</button></div> <div class="modal" id="md"><div class="mbox"><button class="x" id="mx" aria-label="Close">×</button>
+<div id="pwa" class="pwa" hidden role="dialog" aria-label="Install LegalSaathi app">   <img src="/icon-192.png" alt="">   <div class="pt"><b>Install LegalSaathi</b><span id="pwa-s">Open faster and track your order in one tap</span></div>   <button id="pwa-b" type="button">Install</button>   <button id="pwa-x" type="button" aria-label="Dismiss">×</button> </div> <div class="modal" id="md"><div class="mbox"><button class="x" id="mx" aria-label="Close">×</button>
 <div class="vw" id="v-check" hidden><h3 id="ck-t"></h3><p class="sub">Keep these ready before you start. It takes about 2 minutes.</p><ul class="ck" id="ck-l"></ul><button class="btn" id="ck-go">I have them, continue <i data-i="arrow"></i></button></div>
 <form class="vw" id="v-form" hidden><h3 id="fm-t"></h3>
 <input id="o-name" autocomplete="name" placeholder="Full name" required><input id="o-ph" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number" required>
@@ -301,7 +309,22 @@ $("#v-join").onsubmit=async e=>{e.preventDefault();const o=$("#j-o");if(!SB.url)
  try{await gate("join",{name:$("#j-n").value,phone:$("#j-p").value,role:$("#j-r").value,note:$("#j-m").value},"j");o.textContent="Thanks! We will call you soon."}catch(x){o.textContent=x&&x.m||"Could not send. Please call 8881333921."}};
 document.addEventListener("click",e=>{const o=e.target.closest("[data-order]"),j=e.target.closest("[data-join]"),t=e.target.closest("[data-track]");if(o){e.preventDefault();order(o.dataset.order)}else if(j){e.preventDefault();show("v-join")}else if(t){e.preventDefault();show("v-track")}});
 $("#mx").onclick=closeM;$("#md").onclick=e=>{if(e.target.id=="md")closeM()};
-if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{})); let dip=null;const pw=$("#pwa"); addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;try{if(+localStorage.getItem("pwx")>Date.now())return}catch(_){}setTimeout(()=>pw.hidden=false,15000)}); $("#pwa-b").onclick=async()=>{if(!dip)return;pw.hidden=true;dip.prompt();await dip.userChoice;dip=null}; $("#pwa-x").onclick=()=>{pw.hidden=true;try{localStorage.setItem("pwx",Date.now()+12096e5)}catch(_){}}; addEventListener("appinstalled",()=>pw.hidden=true); const io=new IntersectionObserver(a=>a.forEach(x=>x.isIntersecting&&x.target.classList.add("in")),{threshold:.08});
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{})); (()=>{
+const pw=$("#pwa"),b=$("#pwa-b"),s=$("#pwa-s");let dip=null;
+const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+if(standalone)return; // already installed / opened as app
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const snoozed=()=>{try{return +localStorage.getItem("pwx")>Date.now()}catch(_){return false}};
+const open=()=>{if(!snoozed())pw.hidden=false};
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;setTimeout(open,2500)});
+if(ios){b.textContent="How?";setTimeout(open,3000)}
+b.onclick=async()=>{
+  if(dip){pw.hidden=true;dip.prompt();await dip.userChoice;dip=null;return}
+  if(ios)s.textContent="Tap the Share icon in Safari, then choose “Add to Home Screen”.";
+};
+$("#pwa-x").onclick=()=>{pw.hidden=true;try{localStorage.setItem("pwx",Date.now()+6048e5)}catch(_){}}; // hide 7 days
+addEventListener("appinstalled",()=>pw.hidden=true);
+})();dip.prompt();await dip.userChoice;dip=null}; $("#pwa-x").onclick=()=>{pw.hidden=true;try{localStorage.setItem("pwx",Date.now()+12096e5)}catch(_){}}; addEventListener("appinstalled",()=>pw.hidden=true); const io=new IntersectionObserver(a=>a.forEach(x=>x.isIntersecting&&x.target.classList.add("in")),{threshold:.08});
 document.querySelectorAll(".rv").forEach(r=>io.observe(r)); (()=>{const e=$("#typ");if(!e)return;const t=e.textContent.trim();if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;e.textContent="";let i=0,d=1;(function k(){e.textContent=t.slice(0,i);if(d){if(i++<t.length)return setTimeout(k,38);d=0;return setTimeout(k,3500)}if(i>0){i-=3;if(i<0)i=0;return setTimeout(k,12)}d=1;setTimeout(k,600)})()})();
 </script>
 </body>
