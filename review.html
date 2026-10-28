@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#f4ead6">
+<title>Write a review | LegalSaathi</title>
+<link rel="icon" href="legalsathilogo.webp">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f4ead6;color:#2a1a0f;min-height:100dvh;display:grid;place-items:center;padding:20px}
+.card{width:min(440px,100%);background:linear-gradient(150deg,#fffdf6,#f1e3c3);border:1px solid rgba(140,100,40,.3);border-radius:26px;padding:28px;box-shadow:0 30px 60px rgba(90,60,30,.3)}
+.brand{display:flex;align-items:center;gap:9px;font:800 1.2rem 'Playfair Display',serif;margin-bottom:16px}
+.brand img{height:34px;width:34px;border-radius:8px;object-fit:contain}.brand b{color:#a8741a}
+h1{font:800 1.5rem 'Playfair Display',serif;margin-bottom:6px}
+.sub{color:#6f5a43;font-size:.86rem;line-height:1.5;margin-bottom:16px}
+input,textarea{width:100%;margin-bottom:10px;padding:13px;border-radius:14px;border:1px solid rgba(90,60,30,.18);font:.9rem 'Plus Jakarta Sans',sans-serif;background:#fff;color:#2a1a0f}
+.stars{display:flex;gap:6px;margin-bottom:12px}
+.stars button{background:none;border:0;font-size:2rem;line-height:1;cursor:pointer;color:#d8c9a8}
+.stars button.on{color:#c48d2c}
+.btn{width:100%;border:0;cursor:pointer;font:700 .95rem 'Plus Jakarta Sans',sans-serif;padding:14px;border-radius:50px;color:#1a120b;background:linear-gradient(180deg,#f6d27c,#c48d2c);box-shadow:0 5px 0 #7d5513}
+.btn:disabled{opacity:.6}
+.err{color:#b3261e;font-size:.82rem;margin-top:10px}
+.ok{text-align:center}.ok h1{margin:10px 0}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand"><img src="legalsathilogo.webp" alt="" onerror="this.style.display='none'">Legal<b>Saathi</b></div>
+  <form id="f">
+    <h1>Share your experience</h1>
+    <p class="sub">Your review helps others in Lucknow. It takes about a minute.</p>
+    <input id="n" placeholder="Your name" maxlength="60" required>
+    <input id="t" placeholder="Your token number (e.g. LS-AB12CD)" maxlength="12" autocapitalize="characters" required>
+    <input id="a" placeholder="Your area in Lucknow (optional)" maxlength="40">
+    <div class="stars" id="st"></div>
+    <textarea id="b" rows="4" maxlength="300" placeholder="Write your review (10 to 300 characters)" required></textarea>
+    <button class="btn" id="go">Submit review</button>
+    <p class="err" id="er"></p>
+  </form>
+  <div class="ok" id="ok" hidden><div style="font-size:2.4rem">🙏</div><h1>Thank you!</h1><p class="sub">Your review has been published on our website.</p></div>
+</div>
+<script src="config.js"></script>
+<script>
+const $=s=>document.querySelector(s),code=new URLSearchParams(location.search).get("c")||"";let rate=5;
+const draw=()=>$("#st").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" class="${n<=rate?"on":""}" aria-label="${n} stars">★</button>`).join("");
+draw();
+$("#st").onclick=e=>{const b=e.target.closest("[data-n]");if(b){rate=+b.dataset.n;draw()}};
+$("#f").onsubmit=async e=>{e.preventDefault();const er=$("#er"),go=$("#go");er.textContent="";
+ if(!code||!SB.url){er.textContent="This review link is not valid.";return}
+ go.disabled=true;
+ try{
+  const x=await fetch(SB.url+"/rest/v1/rpc/submit_review",{method:"POST",headers:{apikey:SB.key,Authorization:"Bearer "+SB.key,"Content-Type":"application/json"},body:JSON.stringify({c:code,n:$("#n").value.trim(),t:$("#t").value.trim(),r:rate,b:$("#b").value.trim(),a:$("#a").value.trim()})});
+  if(!x.ok){const d=await x.json().catch(()=>({})),m=d.message||"";
+   throw m.includes("token")?"We could not find this token number. Please check it.":m.includes("link")?"This review link was already used or is not valid.":/duplicate|unique/i.test(m)?"A review for this token was already submitted.":"Could not submit. Please check your details."}
+  $("#f").hidden=true;$("#ok").hidden=false;
+ }catch(m){er.textContent=typeof m=="string"?m:"Could not submit. Please try again."}
+ go.disabled=false};
+</script>
+</body>
+</html>
