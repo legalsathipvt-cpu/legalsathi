@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact LegalSaathi | Affidavit &amp; Rent Agreement in Lucknow</title>
+<meta name="description" content="Contact LegalSaathi in Lucknow for affidavits, rent agreements and legal documents. Call, email or send us your query online.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://legalsathi.co.in/contact/">
+<meta name="theme-color" content="#f4ead6">
+<link rel="icon" href="/legalsathilogo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site-pages.css">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+</head>
+<body>
+
+<header class="phero one">
+  <div>
+    <div class="eyebrow">Contact · Lucknow</div>
+    <h1>We're here to <em>help</em></h1>
+    <p class="lead">Have a question about a document, your order or our services? Send us a message and our team will get back to you.</p>
+  </div>
+</header>
+
+<section>
+  <div class="cgrid">
+    <div class="info">
+      <a class="tilt rv" href="tel:+918881333921"><div class="ic" data-i="phone"></div><div><h3>Call us</h3><p>+91 88813 33921</p></div></a>
+      <a class="tilt dark rv" href="mailto:hello@legalsathi.co.in"><div class="ic" data-i="mail"></div><div><h3>Email us</h3><p>hello@legalsathi.co.in</p></div></a>
+      <div class="tilt rv"><div class="ic" data-i="pin"></div><div><h3>Service area</h3><p>Lucknow, Uttar Pradesh</p></div></div>
+      <a class="tilt dark rv" href="/#services"><div class="ic" data-i="file"></div><div><h3>Need a document?</h3><p>Place a request and get a token number to track it.</p></div></a>
+    </div>
+
+    <form class="fbox rv" id="cf" novalidate>
+      <h2>Send us a message</h2>
+      <p class="sub">Fill in the form and your query will reach our team directly.</p>
+      <label for="c-n">Full name</label>
+      <input id="c-n" autocomplete="name" placeholder="Your name" required maxlength="80">
+      <label for="c-p">Mobile / WhatsApp number</label>
+      <input id="c-p" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number" required>
+      <label for="c-e">Email (optional)</label>
+      <input id="c-e" type="email" autocomplete="email" placeholder="you@example.com" maxlength="120">
+      <label for="c-s">Subject</label>
+      <select id="c-s"><option>General question</option><option>Order / tracking help</option><option>Pricing</option><option>Rent agreement</option><option>Affidavit</option><option>Feedback / complaint</option><option>Other</option></select>
+      <label for="c-m">Your message</label>
+      <textarea id="c-m" placeholder="Tell us how we can help" required maxlength="1500"></textarea>
+      <label class="cs"><input type="checkbox" id="c-ok" required><span>I agree to be contacted on this number. See our <a href="/terms-&amp;-conditions/#privacy" style="color:var(--gold);font-weight:700">Privacy Policy</a>.</span></label>
+      <div id="ts-c" style="margin-bottom:12px"></div>
+      <button class="btn" id="c-b" type="submit">Send Message <i data-i="arrow"></i></button>
+      <p class="msg" id="c-o" role="status"></p>
+    </form>
+  </div>
+</section>
+
+<script src="/config.js"></script>
+<script src="/site-pages.js"></script>
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var wid;
+/* load the security check once the Cloudflare script is ready */
+(function wait(n){
+ if(window.turnstile&&window.TS){wid=turnstile.render('#ts-c',{sitekey:TS,theme:'light'});return}
+ if(n<60)setTimeout(function(){wait(n+1)},250);
+})(0);
+
+async function call(action,payload,token){
+ var x=await fetch(SB.url+'/functions/v1/gate',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB.key,Authorization:'Bearer '+SB.key},body:JSON.stringify({action:action,token:token,payload:payload})});
+ var d=await x.json().catch(function(){return{}});
+ return{ok:x.ok,d:d};
+}
+
+$('#cf').onsubmit=async function(e){
+ e.preventDefault();
+ var o=$('#c-o'),b=$('#c-b');o.className='msg';o.textContent='';
+ var name=$('#c-n').value.trim(),phone=$('#c-p').value.trim(),email=$('#c-e').value.trim(),subj=$('#c-s').value,msg=$('#c-m').value.trim();
+ if(!name||!msg){o.className='msg er';o.textContent='Please enter your name and message.';return}
+ if(!/^[6-9][0-9]{9}$/.test(phone)){o.className='msg er';o.textContent='Please enter a valid 10-digit mobile number.';return}
+ if(!$('#c-ok').checked){o.className='msg er';o.textContent='Please tick the consent box.';return}
+ if(typeof SB==='undefined'||!SB.url){o.className='msg er';o.textContent='Online service is being set up. Please call 8881333921.';return}
+ if(wid===undefined){o.className='msg er';o.textContent='Security check is still loading. Please wait a moment and try again.';return}
+ var t=turnstile.getResponse(wid);
+ if(!t){o.className='msg er';o.textContent='Please complete the security check.';return}
+ b.disabled=true;o.textContent='Sending…';
+ try{
+  var r=await call('contact',{name:name,phone:phone,email:email,subject:subj,message:msg,date:'2026-10-29'},t);
+  if(!r.ok)throw 0;
+  o.className='msg ok';o.textContent='Thank you! Your message has been sent. We will contact you soon.';
+  $('#cf').reset();
+ }catch(err){
+  o.className='msg er';o.textContent='Could not send right now. Please try again or call 8881333921.';
+ }
+ try{turnstile.reset(wid)}catch(_){}
+ b.disabled=false;
+};
+})();
+</script>
+</body>
+</html>
