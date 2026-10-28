@@ -92,7 +92,7 @@ h2{font-size:1.05rem;margin:18px 0 10px}
   <button data-t="reviews"><svg class="i" viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21.1l1.4-7L2 9.3l7-.8z"/></svg>Reviews</button> <button data-t="settings"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Settings</button>
 </aside>
 <main>
-  <div class="top"><h1 id="ttl">Dashboard</h1><div class="act"><button class="ib inst" hidden type="button" title="Install app" aria-label="Install app"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></button><span class="role" id="role"></span><button class="ib" id="bell" title="Alerts" aria-label="Enable alerts"><svg class="i" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg></button><button class="ib" id="out" title="Sign out" aria-label="Sign out"><svg class="i" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M16 8l5 4-5 4M21 12H9"/></svg></button></div></div>
+  <div class="top"><div style="display:flex;align-items:center;gap:10px;min-width:0"><button class="ib" id="bk" hidden type="button" aria-label="Back"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1 id="ttl">Dashboard</h1></div><div class="act"><button class="ib inst" hidden type="button" title="Install app" aria-label="Install app"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></button><span class="role" id="role"></span><button class="ib" id="bell" title="Alerts" aria-label="Enable alerts"><svg class="i" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg></button><button class="ib" id="out" title="Sign out" aria-label="Sign out"><svg class="i" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M16 8l5 4-5 4M21 12H9"/></svg></button></div></div>
   <section id="t-dash"></section>
   <section id="t-orders" hidden><div class="tools"><input id="oq" placeholder="Search token, name or phone"><select id="of"><option value="act">Active</option><option value="need">Needs action</option><option value="done">Delivered</option><option value="">All</option></select><select id="os"></select></div><div id="ol"></div></section>
   <section id="t-joins" hidden><div class="tools"><select id="jf" style="grid-column:1/-1"><option value="new">New</option><option value="done">Handled</option><option value="">All</option></select></div><div id="jl"></div></section>
@@ -130,7 +130,7 @@ $("#out").onclick=async()=>{await sb.auth.signOut();location.reload()};
 async function enter(){const{data:{user}}=await sb.auth.getUser();if(!user){$("#login").hidden=false;return}
  const{data:s}=await sb.from("staff").select("name,role,user_id").eq("user_id",user.id).maybeSingle();
  if(!s){await sb.auth.signOut();$("#login").hidden=false;$("#lerr").textContent="This account has no admin access.";return}
- me=s;$("#login").hidden=true;$("#app").hidden=false;$("#role").textContent=s.role;await load();loadRevs();subs();setInterval(render,3e4)}
+ me=s;$("#login").hidden=true;$("#app").hidden=false;$("#role").textContent=s.role;await load();loadRevs();subs();setInterval(render,3e4);{const h=location.hash.slice(1);if(T[h])showTab(h)}}
 async function load(){const[a,b,c,d]=await Promise.all([sb.from("services").select("*").order("sort"),sb.from("orders").select("*").order("created_at",{ascending:false}).limit(500),sb.from("join_requests").select("*").order("created_at",{ascending:false}).limit(300),sb.from("settings").select("*")]);
  svcs=a.data||[];ords=b.data||[];joins=c.data||[];cfg=Object.fromEntries((d.data||[]).map(x=>[x.key,x.value]));
  if(own()){const s=await sb.from("staff").select("*");stf=s.data||[]}
@@ -140,7 +140,7 @@ function subs(){sb.channel("live").on("postgres_changes",{event:"INSERT",schema:
  .on("postgres_changes",{event:"INSERT",schema:"public",table:"join_requests"},p=>{joins.unshift(p.new);ping("New join request",p.new.name+" · "+p.new.role,()=>go("joins"));render()}).subscribe()}
 /* nav */
 const T={dash:"Dashboard",orders:"Orders",joins:"Join Requests",services:"Services",reviews:"Reviews",settings:"Settings"};
-function go(t){tab=t;document.querySelectorAll("aside button").forEach(b=>b.classList.toggle("on",b.dataset.t==t));Object.keys(T).forEach(k=>$("#t-"+k).hidden=k!=t);$("#ttl").textContent=T[t];render();scrollTo(0,0)}
+let prev=""; function showTab(t){if(t!=tab)prev=tab;tab=t;document.querySelectorAll("aside button").forEach(b=>b.classList.toggle("on",b.dataset.t==t));Object.keys(T).forEach(k=>$("#t-"+k).hidden=k!=t);$("#ttl").textContent=T[t];$("#bk").hidden=t=="dash";render();scrollTo(0,0)} function go(t){if(location.hash.slice(1)==t)showTab(t);else location.hash=t} addEventListener("hashchange",()=>{const t=location.hash.slice(1);showTab(T[t]?t:"dash")}); $("#bk").onclick=()=>go(prev&&prev!=tab?prev:"dash");
 document.querySelectorAll("aside button").forEach(b=>b.onclick=()=>go(b.dataset.t));
 function render(){const nj=joins.filter(j=>!j.handled).length,ng=ords.filter(o=>live(o).gate).length;
  $("#b-j").hidden=!nj;$("#b-j").textContent=nj;$("#b-o").hidden=!ng;$("#b-o").textContent=ng;
