@@ -335,7 +335,7 @@ $("#ck-go").onclick=()=>{$("#fm-t").textContent=S[cur].t+" · Your details";$("#
  if(cur=="drafting")$("#o-extra [data-x=pages]").value=$("#pg").value;
  try{const L=JSON.parse(localStorage.getItem("ls")||"{}");$("#o-name").value=L.n||"";$("#o-ph").value=L.p||"";$("#o-addr").value=L.a||"";$("#o-pin").value=L.z||""}catch(_){}show("v-form")};
 const UPI="8881333791@ptyes";
-const payUI=()=>{const u=document.querySelector("[name=pay]:checked").value=="upi";$("#o-upi").hidden=!u;if(!u||!S[cur])return;const a=cur=="drafting"?S.drafting.p*Math.max(1,+$("#pg").value||1):S[cur].p;$("#o-amt").textContent="₹"+a;$("#o-upiid").textContent=UPI;$("#o-upl").href="upi://pay?pa="+UPI+"&pn=LegalSaathi&cu=INR&tn="+encodeURIComponent(S[cur].t)};
+const payUI=()=>{const u=document.querySelector("[name=pay]:checked").value=="upi";$("#o-upi").hidden=!u;if(!u||!S[cur])return;const a=cur=="drafting"?S.drafting.p*Math.max(1,+$("#pg").value||1):S[cur].p;$("#o-amt").textContent="₹"+a;$("#o-upiid").textContent=UPI;$("#o-upl").href="upi://pay?pa="+UPI+"&pn=LegalSaathi&am="+a+"&cu=INR&tn="+encodeURIComponent(S[cur].t)};
 $("#o-pay").onchange=payUI;$("#ck-go").addEventListener("click",payUI);
 $("#o-shot").onchange=e=>$("#o-sn").textContent=e.target.files.length?"Screenshot selected":"Attach payment screenshot";
  $("#o-del").onchange=()=>$("#o-addr-w").hidden=document.querySelector("[name=del]:checked").value=="digital";
