@@ -127,13 +127,13 @@ $("#bell").onclick=async()=>{try{const r=await Notification.requestPermission();
 /* auth */
 $("#lf").onsubmit=async e=>{e.preventDefault();$("#lerr").textContent="";const{error}=await sb.auth.signInWithPassword({email:$("#le").value,password:$("#lp").value});error?$("#lerr").textContent="Wrong email or password.":enter()};
 $("#out").onclick=async()=>{await sb.auth.signOut();location.reload()};
-async function enter(){const{data:{user}}=await sb.auth.getUser();if(!user){$("#login").hidden=false;return}
+async function enter(){const{data:{session}}=await sb.auth.getSession(),user=session&&session.user;if(!user){$("#login").hidden=false;return}
  const{data:s}=await sb.from("staff").select("name,role,user_id").eq("user_id",user.id).maybeSingle();
  if(!s){await sb.auth.signOut();$("#login").hidden=false;$("#lerr").textContent="This account has no admin access.";return}
  me=s;$("#login").hidden=true;$("#app").hidden=false;$("#role").textContent=s.role;await load();loadRevs();subs();setInterval(render,3e4);{const h=location.hash.slice(1);if(T[h])showTab(h)}}
 async function load(){const[a,b,c,d]=await Promise.all([sb.from("services").select("*").order("sort"),sb.from("orders").select("*").order("created_at",{ascending:false}).limit(500),sb.from("join_requests").select("*").order("created_at",{ascending:false}).limit(300),sb.from("settings").select("*")]);
  svcs=a.data||[];ords=b.data||[];joins=c.data||[];cfg=Object.fromEntries((d.data||[]).map(x=>[x.key,x.value]));
- if(own()){const s=await sb.from("staff").select("*");stf=s.data||[]}
+ if(own())sb.from("staff").select("*").then(s=>{stf=s.data||[];if(tab=="settings")render()});
  $("#os").innerHTML='<option value="">All services</option>'+svcs.map(s=>`<option value="${esc(s.id)}">${esc(s.title)}</option>`).join("");render()}
 function subs(){sb.channel("live").on("postgres_changes",{event:"INSERT",schema:"public",table:"orders"},p=>{ords.unshift(p.new);ping("New order "+p.new.token,p.new.service_title+" · "+p.new.name,()=>{go("orders");openO(p.new.id)});render()})
  .on("postgres_changes",{event:"UPDATE",schema:"public",table:"orders"},p=>{const i=ords.findIndex(o=>o.id==p.new.id);if(i>-1){ords[i]=p.new;render();if(cur==p.new.id)openO(cur)}})
@@ -171,8 +171,8 @@ async function openO(id){const o=ords.find(x=>x.id==id);if(!o)return;cur=id;cons
  <h2>Documents</h2><div class="files" id="fz">${o.files&&o.files.length?"Loading…":'<small>No files uploaded.</small>'}</div>
  <h2>Status <small style="display:inline">(tap a step to set it)</small></h2><ol class="tl">${steps}</ol>${L.i<L.n-1?`<button class="btn" data-nx>Move to next step</button>`:""}
  <h2>Internal note</h2><textarea id="inn" rows="3" placeholder="Visible to staff only">${esc(o.internal_note)}</textarea><button class="btn sm ghost" data-sn>Save note</button>${own()?`<div style="margin-top:24px"><button class="btn sm red" data-del>Delete order</button></div>`:""}`);
- if(o.files&&o.files.length){const{data}=await sb.storage.from("order-docs").createSignedUrls(o.files,3600);if(cur!=id)return;$("#fz").innerHTML=(data||[]).map(f=>{const n=(f.path||"").split("/").pop();return f.signedUrl?(/\.(jpe?g|png|webp|gif)$/i.test(n)?`<a target="_blank" rel="noopener" href="${esc(f.signedUrl)}"><img src="${esc(f.signedUrl)}" alt=""></a>`:`<a target="_blank" rel="noopener" href="${esc(f.signedUrl)}"><span>PDF</span></a>`):""}).join("")||'<small>Could not load files.</small>'}}
-async function setStep(o,k){const v={status_idx:k,status_at:new Date().toISOString()},{error}=await sb.from("orders").update(v).eq("id",o.id);if(error)return toast("Failed","Could not update status.");Object.assign(o,v);toast("Status updated",esc(o.token));openO(o.id);render()}
+ if(o.files&&o.files.length){const fk=o.files.join("|");let data=(window.SU=window.SU||{})[fk];if(!data){data=(await sb.storage.from("order-docs").createSignedUrls(o.files,3600)).data;if(data)SU[fk]=data}if(cur!=id)return;$("#fz").innerHTML=(data||[]).map(f=>{const n=(f.path||"").split("/").pop();return f.signedUrl?(/\.(jpe?g|png|webp|gif)$/i.test(n)?`<a target="_blank" rel="noopener" href="${esc(f.signedUrl)}"><img src="${esc(f.signedUrl)}" alt=""></a>`:`<a target="_blank" rel="noopener" href="${esc(f.signedUrl)}"><span>PDF</span></a>`):""}).join("")||'<small>Could not load files.</small>'}}
+async function setStep(o,k){const old={status_idx:o.status_idx,status_at:o.status_at},v={status_idx:k,status_at:new Date().toISOString()};Object.assign(o,v);openO(o.id);render();toast("Status updated",esc(o.token));const{error}=await sb.from("orders").update(v).eq("id",o.id);if(error){Object.assign(o,old);openO(o.id);render();toast("Failed","Could not update status.")}}
 document.addEventListener("click",async e=>{const g=s=>e.target.closest(s);
  if(g("[data-o]"))return openO(g("[data-o]").dataset.o);
   if(g("[data-dall]")){$("#of").value="done";go("orders");return}
