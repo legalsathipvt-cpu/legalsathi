@@ -150,6 +150,7 @@ function rDash(){const d0=new Date().setHours(0,0,0,0),L=ords.map(o=>[o,live(o)]
  $("#t-dash").innerHTML=`<div class="stats"><div class="card"><b>${today}</b><span>New today</span></div><div class="card"><b>${act}</b><span>Active orders</span></div><div class="card"><b>${need.length}</b><span>Needs action</span></div><div class="card"><b>₹${rev.toLocaleString("en-IN")}</b><span>Delivered value (approx.)</span></div></div>
  <h2>Needs action</h2>${need.length?need.slice(0,6).map(x=>oRow(x[0])).join(""):'<div class="empty">Nothing waiting. All good.</div>'}
  <h2>Latest orders</h2>${ords.slice(0,6).map(oRow).join("")||'<div class="empty">No orders yet.</div>'}
+ <h2>Delivered (${dl.length})</h2>${dl.length?dl.slice(0,15).map(x=>oRow(x[0])).join(""):'<div class="empty">No delivered orders yet.</div>'}${dl.length>15?'<button class="btn sm ghost" data-dall>View all delivered</button>':""}
  <h2>New join requests</h2>${joins.filter(j=>!j.handled).slice(0,4).map(jRow).join("")||'<div class="empty">No new requests.</div>'}`}
 function rOrders(){const q=$("#oq").value.toLowerCase(),f=$("#of").value,s=$("#os").value;
  const a=ords.filter(o=>{const L=live(o);if(s&&o.service_id!=s)return false;if(f=="act"&&L.done)return false;if(f=="need"&&!L.gate)return false;if(f=="done"&&!L.done)return false;return!q||(o.token+o.name+o.phone).toLowerCase().includes(q)});
@@ -174,6 +175,7 @@ async function openO(id){const o=ords.find(x=>x.id==id);if(!o)return;cur=id;cons
 async function setStep(o,k){const v={status_idx:k,status_at:new Date().toISOString()},{error}=await sb.from("orders").update(v).eq("id",o.id);if(error)return toast("Failed","Could not update status.");Object.assign(o,v);toast("Status updated",esc(o.token));openO(o.id);render()}
 document.addEventListener("click",async e=>{const g=s=>e.target.closest(s);
  if(g("[data-o]"))return openO(g("[data-o]").dataset.o);
+  if(g("[data-dall]")){$("#of").value="done";go("orders");return}
  if(g("[data-x]"))return closeDw();
  const o=ords.find(x=>x.id==cur);
  if(g("[data-k]")&&o){const k=+g("[data-k]").dataset.k,L=live(o);if(k==L.n-1&&!confirm("Mark as "+L.f[k].n+"?"))return;return setStep(o,k)}
