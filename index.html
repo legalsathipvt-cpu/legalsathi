@@ -254,10 +254,15 @@ Disclaimer: LegalSaathi provides legal documentation assistance and is not a law
 <div class="chips2" id="o-del"><label><input type="radio" name="del" value="doorstep" checked><span>Doorstep delivery</span></label><label><input type="radio" name="del" value="digital"><span>Digital copy</span></label><label><input type="radio" name="del" value="secure"><span>Secure delivery</span></label></div>
 <div id="o-addr-w"><textarea id="o-addr" rows="2" autocomplete="street-address" placeholder="Full delivery address in Lucknow"></textarea><input id="o-pin" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="postal-code" placeholder="Pincode"></div>
 <div class="chips2" id="o-pay" style="grid-template-columns:1fr 1fr"><label><input type="radio" name="pay" value="cod" checked><span>Cash on Delivery</span></label><label><input type="radio" name="pay" value="upi"><span>Pay by UPI / QR</span></label></div>
-<div id="o-upi" hidden style="padding:14px;border:1px dashed var(--gold2);border-radius:14px;background:rgba(255,255,255,.55);margin-bottom:10px;text-align:center">
+<div id="o-bill" style="padding:12px 14px;border-radius:14px;background:#fff;border:1px solid var(--line);margin-bottom:10px;font-size:.86rem">
+<div style="display:flex;justify-content:space-between;padding:3px 0"><span>Service amount</span><b id="b-a"></b></div>
+<div style="display:flex;justify-content:space-between;padding:3px 0"><span>GST (5%)</span><b id="b-g"></b></div>
+<div style="display:flex;justify-content:space-between;padding:7px 0 3px;margin-top:4px;border-top:1px dashed var(--line);font-size:.95rem"><span>Final amount</span><b id="b-t" style="color:var(--gold)"></b></div>
+<small>5% GST Applied</small>
+</div> style="padding:14px;border:1px dashed var(--gold2);border-radius:14px;background:rgba(255,255,255,.55);margin-bottom:10px;text-align:center">
 <img src="upi-qr.png" alt="UPI QR code" onerror="this.style.display='none'" style="width:170px;max-width:100%;border-radius:12px;display:block;margin:0 auto 8px">
 <p class="sub">UPI ID: <b id="o-upiid"></b></p>
-<p class="sub" style="margin-bottom:10px">Amount: <b id="o-amt"></b> (starting price, final amount is confirmed by our team)</p>
+<p class="sub" style="margin-bottom:10px">Pay <b id="o-amt"></b> (5% GST Applied)</p>
 <a class="btn sm" id="o-upl" href="#" style="margin-bottom:12px">Open UPI app</a>
 <p class="sub" style="margin-bottom:10px">After paying, enter the transaction ID or attach a screenshot. You may be asked to submit a screenshot to verify your payment.</p>
 <input id="o-tid" placeholder="UPI transaction ID (12 digits)">
@@ -335,7 +340,7 @@ $("#ck-go").onclick=()=>{$("#fm-t").textContent=S[cur].t+" · Your details";$("#
  if(cur=="drafting")$("#o-extra [data-x=pages]").value=$("#pg").value;
  try{const L=JSON.parse(localStorage.getItem("ls")||"{}");$("#o-name").value=L.n||"";$("#o-ph").value=L.p||"";$("#o-addr").value=L.a||"";$("#o-pin").value=L.z||""}catch(_){}show("v-form")};
 const UPI="8881333791@ptyes";
-const payUI=()=>{const u=document.querySelector("[name=pay]:checked").value=="upi";$("#o-upi").hidden=!u;if(!u||!S[cur])return;const a=cur=="drafting"?S.drafting.p*Math.max(1,+$("#pg").value||1):S[cur].p;$("#o-amt").textContent="₹"+a;$("#o-upiid").textContent=UPI;$("#o-upl").href="upi://pay?pa="+UPI+"&pn=LegalSaathi&am="+a+"&cu=INR&tn="+encodeURIComponent(S[cur].t)};
+const payUI=()=>{const u=document.querySelector("[name=pay]:checked").value=="upi";$("#o-upi").hidden=!u;if(!S[cur])return;const a=cur=="drafting"?S.drafting.p*Math.max(1,+$("#pg").value||1):S[cur].p,g=Math.round(a*5)/100,t=a+g,f=n=>"₹"+Number(n.toFixed(2));$("#b-a").textContent=f(a);$("#b-g").textContent=f(g);$("#b-t").textContent=f(t);$("#o-amt").textContent=f(t);$("#o-upiid").textContent=UPI;$("#o-upl").href="upi://pay?pa="+UPI+"&pn=LegalSaathi&am="+t.toFixed(2)+"&cu=INR&tn="+encodeURIComponent(S[cur].t)};
 $("#o-pay").onchange=payUI;$("#ck-go").addEventListener("click",payUI);
 $("#o-shot").onchange=e=>$("#o-sn").textContent=e.target.files.length?"Screenshot selected":"Attach payment screenshot";
  $("#o-del").onchange=()=>$("#o-addr-w").hidden=document.querySelector("[name=del]:checked").value=="digital";
@@ -350,7 +355,7 @@ if(pay=="cod"&&del=="digital"){er.textContent="Cash on Delivery is only for door
 if(pay=="upi"&&!tid&&!$("#o-shot").files.length){er.textContent="Please enter the UPI transaction ID or attach the payment screenshot.";return}
  b.disabled=true;b.textContent="Submitting…";const x={};document.querySelectorAll("#o-extra [data-x]").forEach(i=>i.value&&(x[i.dataset.x]=i.value));
  try{localStorage.setItem("ls",JSON.stringify({n:$("#o-name").value,p:$("#o-ph").value,a:$("#o-addr").value,z:$("#o-pin").value}))}catch(_){}
- try{const res=await gate("order",{service_id:cur,name:$("#o-name").value.trim(),phone:$("#o-ph").value,delivery:del,address:del=="digital"?"":$("#o-addr").value.trim(),pincode:$("#o-pin").value,note:$("#o-note").value.trim(),extra:{...x,payment:pay=="upi"?"UPI - verify payment":"Cash on Delivery",...(pay=="upi"?{upi_txn_id:tid||"screenshot only"}:{})}},"o");if(res.duplicate){dup(res.order);b.disabled=false;b.textContent="Place Request";return}const tk=res.token;
+ try{const res=await gate("order",{service_id:cur,name:$("#o-name").value.trim(),phone:$("#o-ph").value,delivery:del,address:del=="digital"?"":$("#o-addr").value.trim(),pincode:$("#o-pin").value,note:$("#o-note").value.trim(),extra:{...x,total_with_gst:$("#b-t").textContent,payment:pay=="upi"?"UPI - verify payment":"Cash on Delivery",...(pay=="upi"?{upi_txn_id:tid||"screenshot only"}:{})}},"o");if(res.duplicate){dup(res.order);b.disabled=false;b.textContent="Place Request";return}const tk=res.token;
  const ps=[];for(const[i,f]of fs.entries()){const n=tk+"/"+i+"-"+f.name.replace(/[^\w.\-]/g,"_");try{const u=await fetch(SB.url+"/storage/v1/object/order-docs/"+n,{method:"POST",headers:{apikey:SB.key,Authorization:"Bearer "+SB.key,"Content-Type":f.type||"application/octet-stream"},body:f});if(u.ok)ps.push(n)}catch(_){}}
  if(ps.length)await rpc("attach_files",{t:tk,f:ps});
  $("#tk-n").textContent=tk;$("#tk-w").textContent=ps.length<fs.length?"Some files could not be uploaded. We will call you to collect them.":"";
