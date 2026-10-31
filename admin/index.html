@@ -80,7 +80,8 @@ h2{font-size:1.05rem;margin:18px 0 10px}
 </style>
 </head>
 <body>
-<div id="login" hidden><form class="card" id="lf"><div class="brand"><img src="../legalsathilogo.webp" alt="" onerror="this.style.display='none'">Legal<b>Saathi</b></div><h2 style="margin:0 0 14px">Admin sign in</h2><label class="l">Email</label><input id="le" type="email" autocomplete="username" required><label class="l">Password</label><input id="lp" type="password" autocomplete="current-password" required><button class="btn" style="width:100%">Sign in</button><button class="btn ghost sm inst" hidden type="button" style="width:100%;margin-top:12px">Install app</button><p class="err" id="lerr"></p></form></div>
+<div id="login" hidden><form class="card" id="lf"><div class="brand"><img src="../legalsathilogo.webp" alt="" onerror="this.style.display='none'">Legal<b>Saathi</b></div><h2 style="margin:0 0 14px">Admin sign in</h2><label class="l">Email</label><input id="le" type="email" autocomplete="username" required><label class="l">Password</label><input id="lp" type="password" autocomplete="current-password" required><button class="btn" style="width:100%">Sign in</button><button class="btn ghost sm inst" hidden type="button" style="width:100%;margin-top:12px">Install app</button><p class="err" id="lerr"></p></form>
+<form class="card" id="mf" hidden style="width:min(400px,100%);padding:30px"><h2 style="margin:0 0 10px">Two-step verification</h2><p id="ms" style="font-size:.84rem;color:var(--mut);margin-bottom:12px"></p><div id="mq" style="text-align:center;margin-bottom:10px"></div><label class="l">6-digit code</label><input id="mc" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required><button class="btn" style="width:100%">Verify</button><p class="err" id="merr"></p></form></div>
 
 <div id="app" hidden>
 <aside>
@@ -127,7 +128,26 @@ $("#bell").onclick=async()=>{try{const r=await Notification.requestPermission();
 /* auth */
 $("#lf").onsubmit=async e=>{e.preventDefault();$("#lerr").textContent="";const{error}=await sb.auth.signInWithPassword({email:$("#le").value,password:$("#lp").value});error?$("#lerr").textContent="Wrong email or password.":enter()};
 $("#out").onclick=async()=>{await sb.auth.signOut();location.reload()};
+async function mfaGate(){
+ const{data:a}=await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+ if(a&&a.currentLevel=="aal2")return true;
+ const{data:f}=await sb.auth.mfa.listFactors();
+ const fac=((f&&f.totp)||[]).find(x=>x.status=="verified");
+ $("#login").hidden=false;$("#lf").hidden=true;$("#mf").hidden=false;
+ let id;
+ if(fac){id=fac.id;$("#ms").textContent="Enter the 6-digit code from your authenticator app.";$("#mq").innerHTML=""}
+ else{
+  for(const x of ((f&&f.all)||[]))if(x.status!="verified")await sb.auth.mfa.unenroll({factorId:x.id});
+  const{data:e,error}=await sb.auth.mfa.enroll({factorType:"totp",friendlyName:"LegalSaathi "+Date.now()});
+  if(error){$("#merr").textContent="Could not start setup. Reload and try again.";return false}
+  id=e.id;$("#ms").textContent="Scan this QR code with Google Authenticator or Authy, then enter the 6-digit code it shows.";
+  $("#mq").innerHTML=`<img src="${esc(e.totp.qr_code)}" alt="QR code" style="width:180px;max-width:100%"><small>Or type this key: <b>${esc(e.totp.secret)}</b></small>`}
+ return new Promise(res=>{$("#mf").onsubmit=async ev=>{ev.preventDefault();$("#merr").textContent="";
+  const{error}=await sb.auth.mfa.challengeAndVerify({factorId:id,code:$("#mc").value.trim()});
+  if(error){$("#merr").textContent="Wrong code. Try again.";return}
+  res(true)}})}
 async function enter(){const{data:{session}}=await sb.auth.getSession(),user=session&&session.user;if(!user){$("#login").hidden=false;return}
+ if(!await mfaGate())return;
  const{data:s}=await sb.from("staff").select("name,role,user_id").eq("user_id",user.id).maybeSingle();
  if(!s){await sb.auth.signOut();$("#login").hidden=false;$("#lerr").textContent="This account has no admin access.";return}
  me=s;$("#login").hidden=true;$("#app").hidden=false;$("#role").textContent=s.role;await load();loadRevs();subs();setInterval(render,3e4);{const h=location.hash.slice(1);if(T[h])showTab(h)}}
