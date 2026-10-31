@@ -361,7 +361,7 @@ $("#v-form").onsubmit=async e=>{e.preventDefault();const b=$("#o-sub"),er=$("#o-
  if(!SB.url){er.textContent="Online ordering is being set up. Please call 8881333921.";return}
  const del=document.querySelector("[name=del]:checked").value,fs=[...$("#o-files").files,...$("#o-shot").files];
  if(fs.some(f=>f.size>1e7)){er.textContent="Each file must be under 10 MB.";return}
- if(del!="digital"&&!$("#o-addr").value.trim()){er.textContent="Please enter your delivery address.";return}
+ if(del!="digital"&&!$("#o-addr").value.trim()){er.textContent="Please enter your delivery address.";return}  if(!NOSTAMP.includes(cur)&&!$("#o-stamp").value){er.textContent="Please choose a stamp paper.";return}
 const pay=document.querySelector("[name=pay]:checked").value,tid=$("#o-tid").value.trim();
 if(pay=="cod"&&del=="digital"){er.textContent="Cash on Delivery is only for doorstep or secure delivery. Please choose UPI or change delivery.";return}
 
