@@ -56,6 +56,7 @@ nav{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:
 .btn:hover{transform:translateY(-2px)}
 .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #7d5513,0 4px 8px rgba(0,0,0,.4)}
 .btn.ghost{color:var(--ivory);background:linear-gradient(145deg,rgba(255,240,210,.14),rgba(255,240,210,.04));border:1px solid var(--line);box-shadow:0 5px 0 rgba(90,60,30,.28),inset 0 1px 0 #fff}
+.bad{outline:2px solid #c0392b;outline-offset:3px;border-radius:14px;box-shadow:0 0 0 6px rgba(192,57,43,.15)}
 .upr{display:flex;gap:10px;margin-bottom:12px}.upr .btn{flex:1;justify-content:center;padding:11px 8px;font-size:.8rem;white-space:nowrap}.btn.dk{color:#f6d27c;background:linear-gradient(180deg,#3d2815,#1a120b);box-shadow:0 5px 0 #000,0 10px 18px rgba(26,18,11,.35),inset 0 1px 0 rgba(255,255,255,.15)}.qrp{text-align:center}.qrp img{width:230px;max-width:100%;border-radius:14px;background:#fff;padding:10px;border:1px solid var(--gold2)}
 .btn.sm{padding:9px 18px;font-size:.78rem;box-shadow:0 4px 0 #7d5513,0 8px 14px rgba(0,0,0,.35)}
 /* hero */
@@ -360,14 +361,17 @@ $("#o-pay").onchange=payUI;$("#o-stamp").onchange=stampPv;$("#ck-go").addEventLi
 $("#o-shot").onchange=e=>$("#o-sn").textContent=e.target.files.length?"Screenshot selected":"Attach payment screenshot";
  $("#o-del").onchange=()=>{$("#o-addr-w").hidden=document.querySelector("[name=del]:checked").value=="digital";payUI()};
 $("#o-files").onchange=e=>$("#o-fn").textContent=e.target.files.length?e.target.files.length+" file(s) selected":"Attach documents (photos or PDF, max 10 MB each)";
+const flag=el=>{document.querySelectorAll("#v-form .bad").forEach(x=>x.classList.remove("bad"));el.classList.add("bad");el.scrollIntoView({behavior:"smooth",block:"center"})};
+$("#v-form").addEventListener("invalid",e=>{const f=e.target;if(f===f.form.querySelector(":invalid"))flag(f.type=="checkbox"?(f.closest("label")||f):f)},true);
+["input","change"].forEach(n=>$("#v-form").addEventListener(n,e=>{const b=e.target.closest(".bad");b&&b.classList.remove("bad")}));
 $("#v-form").onsubmit=async e=>{e.preventDefault();const b=$("#o-sub"),er=$("#o-err");er.textContent="";
  if(!SB.url){er.textContent="Online ordering is being set up. Please call 8881333921.";return}
  const del=document.querySelector("[name=del]:checked").value,fs=[...$("#o-files").files,...$("#o-shot").files];
  if(fs.some(f=>f.size>1e7)){er.textContent="Each file must be under 10 MB.";return}
- if(del!="digital"&&!$("#o-addr").value.trim()){er.textContent="Please enter your delivery address.";return}  if(!NOSTAMP.includes(cur)&&!$("#o-stamp").value){er.textContent="Please choose a stamp paper.";return}
+ if(del!="digital"&&!$("#o-addr").value.trim()){flag($("#o-addr-w"));$("#o-addr").focus({preventScroll:true});return}  if(!NOSTAMP.includes(cur)&&!$("#o-stamp").value){flag($("#o-stamp-w"));return}
 const pay=document.querySelector("[name=pay]:checked").value,tid=$("#o-tid").value.trim();
-if(pay=="cod"&&del=="digital"){er.textContent="Cash on Delivery is only for doorstep or secure delivery. Please choose UPI or change delivery.";return}
-if(pay=="upi"){const hs=$("#o-shot").files.length>0;if(!tid&&!hs){er.textContent="Please pay using the UPI button above, then enter the transaction ID or attach the payment screenshot to place your order.";return}if(tid&&!/^\d{12}$/.test(tid)){er.textContent="Please enter the 12-digit UPI transaction ID, or attach the payment screenshot.";return}}
+if(pay=="cod"&&del=="digital"){er.textContent="Cash on Delivery is only for doorstep or secure delivery. Please choose UPI or change delivery.";flag($("#o-pay"));return}
+if(pay=="upi"){const hs=$("#o-shot").files.length>0;if(!tid&&!hs){er.textContent="Please pay using the UPI button above, then enter the transaction ID or attach the payment screenshot to place your order.";flag($("#o-upi"));return}if(tid&&!/^\d{12}$/.test(tid)){er.textContent="Please enter the 12-digit UPI transaction ID, or attach the payment screenshot.";flag($("#o-upi"));return}}
 
  b.disabled=true;b.textContent="Submitting…";const x={};document.querySelectorAll("#o-extra [data-x]").forEach(i=>i.value&&(x[i.dataset.x]=i.value));
  try{localStorage.setItem("ls",JSON.stringify({n:$("#o-name").value,p:$("#o-ph").value,a:$("#o-addr").value,z:$("#o-pin").value}))}catch(_){}
