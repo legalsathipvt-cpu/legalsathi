@@ -347,7 +347,7 @@ $("#ck-go").onclick=()=>{$("#fm-t").textContent=S[cur].t+" · Your details";$("#
  try{const L=JSON.parse(localStorage.getItem("ls")||"{}");$("#o-name").value=L.n||"";$("#o-ph").value=L.p||"";$("#o-addr").value=L.a||"";$("#o-pin").value=L.z||""}catch(_){}show("v-form")};
 const NOSTAMP=["bonafide","anti-ragging"];
 const DEL={doorstep:50,digital:0,secure:90};const delAmt=()=>{const r=document.querySelector("[name=del]:checked");return r?DEL[r.value]||0:0};
-const SD={"10":10,"20":40,"50":90,"100":140,"500":600};let SP={...SD};
+const SD={"10":10,"20":40,"50":80,"100":140,"500":600};let SP={...SD};
 const stampAmt=()=>{const v=$("#o-stamp").value;return !NOSTAMP.includes(cur)&&v&&SP[v]!=null?+SP[v]:0};
 const stampPv=()=>{const v=$("#o-stamp").value,p=$("#o-stamp-pv");p.hidden=!v;$("#b-sr").style.display=NOSTAMP.includes(cur)?"none":"flex";if(v)p.innerHTML=`<div class="stp"><small>INDIA NON JUDICIAL</small><b>₹${esc(v)}</b><span>Stamp paper · Uttar Pradesh</span></div>`;payUI()};
 const buildStamp=()=>{const s=$("#o-stamp"),k=s.value;s.innerHTML='<option value="">Stamp paper</option>'+Object.keys(SP).sort((a,b)=>a-b).map(d=>`<option value="${esc(d)}">₹${esc(d)} stamp paper — ₹${esc(SP[d])}</option>`).join("");s.value=SP[k]!=null?k:"";stampPv()};
