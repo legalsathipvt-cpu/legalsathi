@@ -270,7 +270,7 @@ Disclaimer: LegalSaathi provides legal documentation assistance and is not a law
 <p class="sub">UPI ID: <b id="o-upiid"></b></p>
 <p class="sub" style="margin-bottom:10px">Pay <b id="o-amt"></b></p>
 <a class="btn sm" id="o-upl" href="#" style="margin-bottom:12px">Open UPI app</a>
-<p class="sub" style="margin-bottom:10px">After paying, enter the transaction ID or attach a screenshot. You may be asked to submit a screenshot to verify your payment.</p>
+<p class="sub" style="margin-bottom:10px"><b>Step 1:</b> tap “Open UPI app” and pay. <b>Step 2:</b> come back here and enter the 12-digit transaction ID or attach the payment screenshot. Your order is placed only after that.</p>
 <input id="o-tid" placeholder="UPI transaction ID (12 digits)">
 <label class="up" style="margin-bottom:0"><input type="file" id="o-shot" accept="image/*"><span id="o-sn">Attach payment screenshot</span></label>
 </div>
@@ -352,7 +352,7 @@ const stampAmt=()=>{const v=$("#o-stamp").value;return !NOSTAMP.includes(cur)&&v
 const stampPv=()=>{const v=$("#o-stamp").value,p=$("#o-stamp-pv");p.hidden=!v;$("#b-sr").style.display=NOSTAMP.includes(cur)?"none":"flex";if(v)p.innerHTML=`<div class="stp"><small>INDIA NON JUDICIAL</small><b>₹${esc(v)}</b><span>Stamp paper · Uttar Pradesh</span></div>`;payUI()};
 const buildStamp=()=>{const s=$("#o-stamp"),k=s.value;s.innerHTML='<option value="">Stamp paper</option>'+Object.keys(SP).sort((a,b)=>a-b).map(d=>`<option value="${esc(d)}">₹${esc(d)} stamp paper — ₹${esc(SP[d])}</option>`).join("");s.value=SP[k]!=null?k:"";stampPv()};
 const UPI="8881333921@ptyes";
-const payUI=()=>{const u=document.querySelector("[name=pay]:checked").value=="upi";$("#o-upi").hidden=true;if(!S[cur])return;const a=cur=="drafting"?S.drafting.p*Math.max(1,+$("#pg").value||1):S[cur].p,g=delAmt(),st=stampAmt(),t=a+st+g,f=n=>"₹"+Number(n.toFixed(2));$("#b-a").textContent=f(a);$("#b-s").textContent=f(st);$("#b-g").textContent=f(g);$("#b-t").textContent=f(t);$("#o-amt").textContent=f(t);$("#o-upiid").textContent=UPI;$("#o-upl").href="upi://pay?pa="+UPI+"&pn=LegalSaathi&am="+t.toFixed(2)+"&cu=INR&tn="+encodeURIComponent(S[cur].t)};
+const payUI=()=>{const u=document.querySelector("[name=pay]:checked").value=="upi";$("#o-upi").hidden=!u;if(!S[cur])return;const a=cur=="drafting"?S.drafting.p*Math.max(1,+$("#pg").value||1):S[cur].p,g=delAmt(),st=stampAmt(),t=a+st+g,f=n=>"₹"+Number(n.toFixed(2));$("#b-a").textContent=f(a);$("#b-s").textContent=f(st);$("#b-g").textContent=f(g);$("#b-t").textContent=f(t);$("#o-amt").textContent=f(t);$("#o-upiid").textContent=UPI;$("#o-upl").href="upi://pay?pa="+UPI+"&pn=LegalSaathi&am="+t.toFixed(2)+"&cu=INR&tn="+encodeURIComponent(S[cur].t)};
 $("#o-pay").onchange=payUI;$("#o-stamp").onchange=stampPv;$("#ck-go").addEventListener("click",()=>{$("#o-stamp-w").hidden=NOSTAMP.includes(cur);$("#o-stamp").value="";buildStamp()});$("#ck-go").addEventListener("click",payUI);
 $("#o-shot").onchange=e=>$("#o-sn").textContent=e.target.files.length?"Screenshot selected":"Attach payment screenshot";
  $("#o-del").onchange=()=>{$("#o-addr-w").hidden=document.querySelector("[name=del]:checked").value=="digital";payUI()};
@@ -364,6 +364,7 @@ $("#v-form").onsubmit=async e=>{e.preventDefault();const b=$("#o-sub"),er=$("#o-
  if(del!="digital"&&!$("#o-addr").value.trim()){er.textContent="Please enter your delivery address.";return}  if(!NOSTAMP.includes(cur)&&!$("#o-stamp").value){er.textContent="Please choose a stamp paper.";return}
 const pay=document.querySelector("[name=pay]:checked").value,tid=$("#o-tid").value.trim();
 if(pay=="cod"&&del=="digital"){er.textContent="Cash on Delivery is only for doorstep or secure delivery. Please choose UPI or change delivery.";return}
+if(pay=="upi"){const hs=$("#o-shot").files.length>0;if(!tid&&!hs){er.textContent="Please pay using the UPI button above, then enter the transaction ID or attach the payment screenshot to place your order.";return}if(tid&&!/^\d{12}$/.test(tid)){er.textContent="Please enter the 12-digit UPI transaction ID, or attach the payment screenshot.";return}}
 
  b.disabled=true;b.textContent="Submitting…";const x={};document.querySelectorAll("#o-extra [data-x]").forEach(i=>i.value&&(x[i.dataset.x]=i.value));
  try{localStorage.setItem("ls",JSON.stringify({n:$("#o-name").value,p:$("#o-ph").value,a:$("#o-addr").value,z:$("#o-pin").value}))}catch(_){}
@@ -371,7 +372,7 @@ if(pay=="cod"&&del=="digital"){er.textContent="Cash on Delivery is only for door
  const ps=[];for(const[i,f]of fs.entries()){const n=tk+"/"+i+"-"+f.name.replace(/[^\w.\-]/g,"_");try{const u=await fetch(SB.url+"/storage/v1/object/order-docs/"+n,{method:"POST",headers:{apikey:SB.key,Authorization:"Bearer "+SB.key,"Content-Type":f.type||"application/octet-stream"},body:f});if(u.ok)ps.push(n)}catch(_){}}
  if(ps.length)await rpc("attach_files",{t:tk,f:ps});
  $("#tk-n").textContent=tk;$("#tk-w").textContent=ps.length<fs.length?"Some files could not be uploaded. We will call you to collect them.":"";
- const amt=Number(res.total);$("#tk-pay").innerHTML=pay=="upi"&&amt>0?`<div style="padding:14px;border:1px dashed var(--gold2);border-radius:14px;background:rgba(255,255,255,.55);margin:10px 0;text-align:center"><img src="upi-qr.png" alt="UPI QR code" onerror="this.style.display='none'" style="width:170px;max-width:100%;border-radius:12px;display:block;margin:0 auto 8px"><p class="sub">UPI ID: <b>${esc(UPI)}</b></p><p class="sub" style="margin-bottom:10px">Amount to pay: <b>₹${esc(amt)}</b></p><a class="btn sm" href="upi://pay?pa=${UPI}&pn=LegalSaathi&am=${amt.toFixed(2)}&cu=INR&tn=${encodeURIComponent(tk)}">Open UPI app</a><p class="sub" style="margin-top:10px">After paying, send the payment screenshot with token <b>${esc(tk)}</b> on WhatsApp to 88813 33921. We start your request once payment is confirmed.</p></div>`:"";
+ const amt=Number(res.total);$("#v-done h3").textContent=pay=="upi"?"Order placed":"Request received";$("#tk-pay").innerHTML=pay=="upi"?`<div style="padding:14px;border:1px solid var(--gold2);border-radius:14px;background:rgba(255,255,255,.55);margin:10px 0;text-align:center"><b>✓ Your order is placed.</b><p class="sub" style="margin-top:6px">We have received your payment details of ₹${esc(amt)} and will verify them shortly. We will call you if we need anything else.</p></div>`:"";
 $("#tk-tl").innerHTML=tl(res.order);show("v-done")}catch(x){er.textContent=x&&x.m||"Could not submit right now. Please try again or call 8881333921."}
  b.disabled=false;b.textContent="Place Order"};
 $("#tk-cp").onclick=()=>navigator.clipboard&&navigator.clipboard.writeText($("#tk-n").textContent);
